@@ -1,5 +1,6 @@
-# ssl-skin-lesions
+# An Evaluation of Self-Supervised Pre-Training for Skin-Lesion Analysis
 
+Hello! Here you will find the code to reproduce the results for the paper ["An Evaluation of Self-Supervised Pre-Training for Skin-Lesion Analysis"](https://arxiv.org/abs/2106.09229) 
 
 
 # Datasets
@@ -59,7 +60,10 @@ Now, we need to perform an extra contrastive pre-training - which can use the su
 
 As mentioned in our paper, we train the top-5 best models under full- and low-data regime. Below, we describe the parameters for the top-5 best models for each evaluated pipeline. 
 
-### Hyperoptimized supervised Baseline
+### Hyperoptimized supervised Baseline (SUP -> FT)
+
+We also made available the script ``run_supervied_hypersearch_finetuning.sh`` to run the hyperparameter search in 
+supervised baseline as mentioned in our paper.  We describe top-5 best hyperparamter set in the table below. 
 
 Learning Rate (LR) | LR Scheduler | Batch Size | Balanced Batches?
 ------------ | ------------- | ------------- | ------------- 
@@ -69,7 +73,7 @@ Learning Rate (LR) | LR Scheduler | Batch Size | Balanced Batches?
 0.003| plateau | 128 | Yes
 0.0001| cosine | 32 | Yes
 
-### Self-supervised
+### Self-supervised (SSL -> FT)
 Method | Learning Rate (LR) 
 ------------ | ------------- 
 SimCLR | 0.01
@@ -95,4 +99,14 @@ Temperature | Pre-training batch size | Pre-training epochs | Balanced Batches?
 0.5 | 80 | 200 | Yes
 0.5 | 80 | 200 | No
 0.5 | 80 | 50 | No
+
+
+# Acknowledgments
+- L. Chaves is partially funded by QuintoAndar, and CAPES. 
+- A. Bissoto is partially funded by FAPESP 2019/19619-7. 
+- E. Valle is funded by CNPq 315168/2020-0.
+- S. Avila is partially funded by CNPq PQ-2 315231/2020-3, and 
+FAPESP 2013/08293-7.
+- A. Bissoto and S. Avila are also partially funded by Google LARA 2020.
+- The RECOD lab is funded by grants from FAPESP, CAPES, and CNPq.
 

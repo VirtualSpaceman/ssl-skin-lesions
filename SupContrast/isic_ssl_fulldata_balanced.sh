@@ -13,8 +13,7 @@ for temp in ${temperatures[@]}; do
                 for size in ${img_size[@]}; do
                     # Reset BASH time counter
                     SECONDS=0
-                    printf "Running Experiment with following parameters: 
-                        - Trial: ${trial}
+                    printf "Running Experiment with following parameters:
                         - Temperature: ${temp}
                         - LR Contrastive: ${lr_contrast}
                         - Method: ${method}

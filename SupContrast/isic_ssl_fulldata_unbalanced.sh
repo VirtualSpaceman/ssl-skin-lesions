@@ -14,7 +14,6 @@ for temp in ${temperatures[@]}; do
                     # Reset BASH time counter
                     SECONDS=0
                     printf "Running Experiment with following parameters: 
-                        - Trial: ${trial}
                         - Temperature: ${temp}
                         - LR Contrastive: ${lr_contrast}
                         - Method: ${method}
