@@ -3,7 +3,7 @@
 Hello! Here you will find the code to reproduce the results for the paper ["An Evaluation of Self-Supervised Pre-Training for Skin-Lesion Analysis"](https://arxiv.org/abs/2106.09229) 
 
 
-# Datasets
+## Datasets
 
 You can download the data from the links in below. In all our experiments, we used subsets from the ISIC 2019 challenge training data for training, validating, and testing. More details about each dataset can be found in our paper. 
 
@@ -15,12 +15,18 @@ You can download the data from the links in below. In all our experiments, we us
 
 
 
-# Preparing Data and Environment
+## Preparing Environment and Data 
+
+We used nvidia-docker for all experiments. We made available the ``Dockerfile`` describing our development environment. 
+
+Now, download all data linked in the previous section and adjust both data folder and label paths. 
+
+For ISIC2019, 
+
+We use all other datasets used only on test stage. Then, set the correct image and label paths according to each dataset [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/test_external_datasets.py#L25-L36).
 
 
-
-
-# Self-supervised Checkpoints 
+## Self-supervised Checkpoints 
 
 Here, we list each self-supervised model's checkpoints we used in our experiments. We used each model's weights to initialize a ResNet-50 encoder for fine-tuning experiments using self-supervised pre-trained models. 
 
@@ -34,17 +40,18 @@ Model | Checkpoint link | Notes
 
 Once you download all weights, you need to set the correct path for each method [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/utils/misc.py#L66-L89).
 
-# Runnning 
+## Running 
 
 
 ### Fine-tuning
 
 To run the experiments regarding self-supervised and supervised models, we need to run ``finetuning_ssl.py``.
 
-Essentially, to run a standard fine-tuning procudure you just need to specify which method (``--method`` parameter) you want among the available options {simclr, byol, swav, moco, infomin, baseline}. ``baseline`` stands for supervised training on ImageNet. For example, 
+Essentially, to run a standard fine-tuning procedure you just need to specify which method (``--method`` parameter) 
+among the available options {simclr, byol, swav, moco, infomin, baseline}. The ``baseline`` stands for supervised training on ImageNet. For example, 
 
 ```bash
-  python3 finetuning_ssl --method simclr --lr lr --batch_size batch_size 
+  python3 finetuning_ssl.py --method simclr --lr lr --batch_size batch_size 
 ```
 
 To change any parameter you can take a look at all available options [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/finetuning_ssl.py#L261-L277)
@@ -54,6 +61,10 @@ To change any parameter you can take a look at all available options [here](http
 
 Now, we need to perform an extra contrastive pre-training - which can use the supervised on the self-supervised version  - before fine-tuning step.
 We give more details of how to execute this step at the folder [SupContrast](https://github.com/VirtualSpaceman/ssl-skin-lesions/tree/main/SupContrast).
+
+Once the pre-training is done, just execute the ``isic_contrastive_finetuning.py`` passing the pre-trained model 
+checkpoint on parameter ``--ckpt_path``. Such file is based on ``finetuning_ssl.py``, but with minor changes. 
+We removed the ``--method`` parameter and fixed the ``simclr`` data augmentations during the fine-tuning. Except for ``--method``, all other parameters remain the same as explained in [Fine-tuning section](#fine-tuning). 
 
 ### Testing the models
 
@@ -73,16 +84,16 @@ if the evaluated checkpoint went through a contrastive pre-training, either supe
 
 
 We use test-time augmentation and evaluate the AUC over 50 copies. The datasets available for the ``--dataset`` parameter 
-are {atlas-dermato, atlas-clinical, isic20, pad-ufes-20. As we evaluated 5 distinct test datasets, we created a bash script to ease the whole setup in ``run_test_external.sh``.
+are {atlas-dermato, atlas-clinical, isic20, pad-ufes-20}. As we evaluated 5 distinct test datasets, we created a bash script to ease the whole setup in ``run_test_external.sh``.
 
-# Top-5 Best Experiments
+## Top-5 Best Experiments
 
 As mentioned in our paper, we train the top-5 best models under full- and low-data regime. Below, we describe the parameters for the top-5 best models for each evaluated pipeline. 
 
 ### Hyperoptimized supervised Baseline (SUP -> FT)
 
 We also made available the script ``run_supervied_hypersearch_finetuning.sh`` to run the hyperparameter search in 
-supervised baseline as mentioned in our paper.  We describe top-5 best hyperparamter set in the table below. 
+supervised baseline as mentioned in our paper.  We describe top-5 best hyperparameter combination in the table below. 
 
 Learning Rate (LR) | LR Scheduler | Batch Size | Balanced Batches?
 ------------ | ------------- | ------------- | ------------- 
@@ -120,7 +131,7 @@ Temperature | Pre-training batch size | Pre-training epochs | Balanced Batches?
 0.5 | 80 | 50 | No
 
 
-# Acknowledgments
+## Acknowledgments
 - L. Chaves is partially funded by QuintoAndar, and CAPES. 
 - A. Bissoto is partially funded by FAPESP 2019/19619-7. 
 - E. Valle is funded by CNPq 315168/2020-0.
