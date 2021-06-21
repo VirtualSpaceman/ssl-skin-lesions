@@ -2,6 +2,8 @@
 
 Hello! Here you will find the code to reproduce the results for the paper ["An Evaluation of Self-Supervised Pre-Training for Skin-Lesion Analysis"](https://arxiv.org/abs/2106.09229) 
 
+![Evaluated Pipelines](./images/pipeline.jpeg)
+
 
 ## Datasets
 
