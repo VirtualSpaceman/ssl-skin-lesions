@@ -21,9 +21,11 @@ We used nvidia-docker for all experiments. We made available the ``Dockerfile`` 
 
 Now, download all data linked in the previous section and adjust both data folder and label paths. 
 
-For ISIC2019, 
+For ISIC2019, we recommend setting proper data path for  [finetuning_ssl.py](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/finetuning_ssl.py#L300), 
+[isic_contrastive_finetuning.py](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/isic_contrastive_finetuner.py#L313), 
+and [main_isic_supcon.py](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/SupContrast/main_isic_supcon.py#L168)
 
-We use all other datasets used only on test stage. Then, set the correct image and label paths according to each dataset [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/test_external_datasets.py#L25-L36).
+We use all other datasets only on test stage. Then, set the correct image and label paths for each dataset [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/test_external_datasets.py#L25-L36).
 
 
 ## Self-supervised Checkpoints 
