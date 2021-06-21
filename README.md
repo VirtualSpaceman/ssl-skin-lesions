@@ -43,18 +43,37 @@ To run the experiments regarding self-supervised and supervised models, we need 
 
 Essentially, to run a standard fine-tuning procudure you just need to specify which method (``--method`` parameter) you want among the available options {simclr, byol, swav, moco, infomin, baseline}. ``baseline`` stands for supervised training on ImageNet. For example, 
 
-``
+```bash
   python3 finetuning_ssl --method simclr --lr lr --batch_size batch_size 
-``
+```
 
 To change any parameter you can take a look at all available options [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/finetuning_ssl.py#L261-L277)
 
 
-### Pre-training and Fune-tuning
+### Pre-training and Fine-tuning
 
 Now, we need to perform an extra contrastive pre-training - which can use the supervised on the self-supervised version  - before fine-tuning step.
+We give more details of how to execute this step at the folder [SupContrast](https://github.com/VirtualSpaceman/ssl-skin-lesions/tree/main/SupContrast).
 
 ### Testing the models
+
+You can use the file ``test_external_datasets.py`` to run the test step with a trained model. For example, 
+
+```bash
+  python3 test_external_datasets.py --dataset ds --ckpt_path path
+```
+
+or 
+
+```bash
+  python3 test_external_datasets.py --dataset ds --ckpt_path path --fromcl
+```
+
+if the evaluated checkpoint went through a contrastive pre-training, either supervised or self-supervised. 
+
+
+We use test-time augmentation and evaluate the AUC over 50 copies. The datasets available for the ``--dataset`` parameter 
+are {atlas-dermato, atlas-clinical, isic20, pad-ufes-20. As we evaluated 5 distinct test datasets, we created a bash script to ease the whole setup in ``run_test_external.sh``.
 
 # Top-5 Best Experiments
 
