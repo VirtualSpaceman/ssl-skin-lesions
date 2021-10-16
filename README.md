@@ -4,10 +4,11 @@ Hello! Here you will find the code to reproduce the results for the paper ["An E
 
 ![Evaluated Pipelines](./images/pipeline.jpeg)
 
+---
 
 ## Datasets
 
-You can download the data from the links in below. In all our experiments, we used subsets from the ISIC 2019 challenge training data for training, validating, and testing. More details about each dataset can be found in our paper. 
+To download all data to reproduce our work please use the links in below. In all experiments, we used subsets from the ISIC 2019 challenge training data for training, validating, and testing. More details about each dataset can be found in our paper. 
 
 - [ISIC 2019](https://challenge2019.isic-archive.com/data.html)
 - [ISIC 2020](https://www.kaggle.com/c/siim-isic-melanoma-classification)
@@ -15,7 +16,7 @@ You can download the data from the links in below. In all our experiments, we us
 - [derm7pt-dermato](https://github.com/jeremykawahara/derm7pt)
 - [PAD-UFES-20](https://data.mendeley.com/datasets/zr7vgbcyr2/1)
 
-
+--- 
 
 ## Preparing Environment and Data 
 
@@ -29,10 +30,11 @@ and [main_isic_supcon.py](https://github.com/VirtualSpaceman/ssl-skin-lesions/bl
 
 We use all other datasets only on test stage. Then, set the correct image and label paths for each dataset [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/test_external_datasets.py#L25-L36).
 
+---
 
 ## Self-supervised Checkpoints 
 
-Here, we list each self-supervised model's checkpoints we used in our experiments. We used each model's weights to initialize a ResNet-50 encoder for fine-tuning experiments using self-supervised pre-trained models. 
+We used each model's weights to initialize a ResNet-50 encoder for fine-tuning experiments using self-supervised pre-trained models. Below you will find a list of each model's checkpoints to download.
 
 Model | Checkpoint link | Notes
 ------------ | ------------- | ------------- 
@@ -42,12 +44,15 @@ Model | Checkpoint link | Notes
 [MoCo](https://arxiv.org/abs/2003.04297) | https://github.com/facebookresearch/moco#models | MoCo V2 checkpoint trained for 800 epochs 
 [InfoMIN](https://arxiv.org/abs/2005.10243) | https://github.com/HobbitLong/PyContrast/blob/master/pycontrast/docs/MODEL_ZOO.md | -
 
-Once you download all weights, you need to set the correct path for each method [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/utils/misc.py#L66-L89).
+Once you downloaded all the weights, you need to set the correct path for each method [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/utils/misc.py#L66-L89).
+
+
+---
 
 ## Running 
 
 
-### Fine-tuning
+### Fine-tuning Only
 
 To run the experiments regarding self-supervised and supervised models, we need to run ``finetuning_ssl.py``.
 
@@ -58,17 +63,20 @@ among the available options {simclr, byol, swav, moco, infomin, baseline}. The `
   python3 finetuning_ssl.py --method simclr --lr lr --batch_size batch_size 
 ```
 
-To change any parameter you can take a look at all available options [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/finetuning_ssl.py#L261-L277)
+To check all the parameters available please take a look at [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/finetuning_ssl.py#L261-L277)
 
 
 ### Pre-training and Fine-tuning
 
-Now, we need to perform an extra contrastive pre-training - which can use the supervised on the self-supervised version  - before fine-tuning step.
-We give more details of how to execute this step at the folder [SupContrast](https://github.com/VirtualSpaceman/ssl-skin-lesions/tree/main/SupContrast).
 
-Once the pre-training is done, just execute the ``isic_contrastive_finetuning.py`` passing the pre-trained model 
+In this pipeline we perform an additional contrastive pre-training - which can use the supervised on the self-supervised version  - before fine-tuning.
+We give more details of how to execute the contrastive pre-training at the folder [SupContrast](https://github.com/VirtualSpaceman/ssl-skin-lesions/tree/main/SupContrast).
+
+When the pre-training finishes, just execute the ``isic_contrastive_finetuning.py`` passing the pre-trained model 
 checkpoint on parameter ``--ckpt_path``. Such file is based on ``finetuning_ssl.py``, but with minor changes. 
-We removed the ``--method`` parameter and fixed the ``simclr`` data augmentations during the fine-tuning. Except for ``--method``, all other parameters remain the same as explained in [Fine-tuning section](#fine-tuning). 
+We removed the ``--method`` parameter and fixed the ``simclr`` data augmentations during the fine-tuning. Except for the ``--method`` parameter, all the remaining ones are the same as explained in [Fine-tuning section](#fine-tuning). 
+
+--- 
 
 ### Testing the models
 
@@ -90,9 +98,11 @@ if the evaluated checkpoint went through a contrastive pre-training, either supe
 We use test-time augmentation and evaluate the AUC over 50 copies. The datasets available for the ``--dataset`` parameter 
 are {atlas-dermato, atlas-clinical, isic20, pad-ufes-20}. As we evaluated 5 distinct test datasets, we created a bash script to ease the whole setup in ``run_test_external.sh``.
 
+---
+
 ## Top-5 Best Experiments
 
-As mentioned in our paper, we train the top-5 best models under full- and low-data regime. Below, we describe the parameters for the top-5 best models for each evaluated pipeline. 
+As mentioned in our paper, we train the top-5 best models under full- and low-data regime. Below, we describe the parameters for the top-5 best models for each evaluated pipeline.
 
 ### Hyperoptimized supervised Baseline (SUP -> FT)
 
