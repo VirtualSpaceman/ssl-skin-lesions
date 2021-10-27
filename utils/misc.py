@@ -69,7 +69,7 @@ def get_model(method, ft_from_featuremap):
         resnet.fc = Identity()
     elif method == 'swav':
         #weights from https://github.com/facebookresearch/swav
-        resnet = torch.hub.load('facebookresearch/swav', 'resnet50')
+        resnet = torch.hub.load('facebookresearch/swav:main', 'resnet50')
         resnet.fc = Identity()
     elif method == 'baseline':
         resnet = models.resnet50(pretrained=True)
