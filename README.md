@@ -57,10 +57,10 @@ Once you downloaded all the weights, you need to set the correct path for each m
 To run the experiments regarding self-supervised and supervised models, we need to run ``finetuning_ssl.py``.
 
 Essentially, to run a standard fine-tuning procedure you just need to specify which method (``--method`` parameter) 
-among the available options {simclr, byol, swav, moco, infomin, baseline}. The ``baseline`` stands for supervised training on ImageNet. For example, 
+among the available options {simclr, byol, swav, moco, infomin, baseline} and the folder containing the train and validation splits for the ISIC2019 dataset. The splits used in our paper are in the ``datasplits`` folder. The ``baseline`` stands for supervised training on ImageNet. A minor example of how our code: 
 
 ```bash
-  python3 finetuning_ssl.py --method simclr --lr lr --batch_size batch_size 
+  python3 finetuning_ssl.py --method simclr --lr lr --batch_size batch_size --splits_folder /ssl-skin-lesions/datasplits/isic2019/splits/
 ```
 
 To check all the parameters available please take a look at [here](https://github.com/VirtualSpaceman/ssl-skin-lesions/blob/main/finetuning_ssl.py#L261-L277)

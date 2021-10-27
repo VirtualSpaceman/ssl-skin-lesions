@@ -1,19 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-from comet_ml import Experiment
-
 import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import CSVLogger, CometLogger
-from pytorch_lightning.loggers.base import LoggerCollection
+from pytorch_lightning.loggers import CSVLogger
 from pytorch_lightning import Trainer
 from pytorch_lightning import seed_everything
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, LearningRateMonitor
@@ -123,12 +117,6 @@ class ISICFineTuner(pl.LightningModule):
         auc = metrics.roc_auc_score(labels, confidence)
         
         self.log(f'train_AUC_epoch', auc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        
-        #log to commet
-        if self.logger not in [False, None] and isinstance(self.logger, LoggerCollection):
-            for log in self.logger:
-                if isinstance(log, CometLogger):
-                    log.experiment.log_metric(f"train_AUC", auc, step=self.current_epoch+1)
     
     def validation_step(self, batch, batch_idx):
         """
@@ -175,12 +163,6 @@ class ISICFineTuner(pl.LightningModule):
         auc = metrics.roc_auc_score(labels, confidence)
         
         self.log(f'val_AUC_epoch', auc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        
-        #log to commet
-        if self.logger not in [False, None] and isinstance(self.logger, LoggerCollection):
-            for log in self.logger:
-                if isinstance(log, CometLogger):
-                    log.experiment.log_metric(f"val_AUC", auc, step=self.current_epoch+1)
     
         
     def test_step(self, batch, batch_idx):
@@ -249,15 +231,6 @@ class ISICFineTuner(pl.LightningModule):
         self.log(f'test_AUC_epoch', auc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         self.log(f'test_balanced_ACC_epoch', balanced_acc, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         
-        #log to commet
-        if self.logger not in [False, None] and isinstance(self.logger, LoggerCollection):
-            for log in self.logger:
-                if isinstance(log, CometLogger):
-                    log.experiment.log_metric(f"test_AUC", auc, step=self.current_epoch+1)
-                    log.experiment.log_metric(f"balanced_ACC", balanced_acc, step=self.current_epoch+1)
-                    log.experiment.log_confusion_matrix(all_labels, model_predictions,
-                                                        labels=["Benign", "Malignant"])
-        
     
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), lr=self.params.lr, momentum=0.9, weight_decay=0.001)
@@ -302,7 +275,6 @@ if __name__ == "__main__":
     for k, v in vars(args).items():
         print(f"{k}: {v}")
 
-
     print("Setting Up datasets and augmentations...")
     
     #use fix transformations for simclr fine-tuning
@@ -338,34 +310,10 @@ if __name__ == "__main__":
             print("Setting Up loggers and callbacks...")
             name_exp = args.ckpt_path.split('/')[-2]
 
-            #create the comet logger
-            comet_logger = CometLogger(
-                api_key=os.getenv("COMET_API_KEY"),
-                project_name='isic2019-ssl',
-                workspace=os.getenv("COMET_WORKSPACE"),
-                experiment_name=name_exp
-            )
-
-            #TODO: mudar
             model_path = f"{args.model_path}{name_exp}"
 
             csv = CSVLogger(model_path, name="finetuning")
-            
-            comet_logger.experiment.log_parameter('ckpt_name', args.ckpt_path.split('/')[-1])
-            comet_logger.experiment.log_parameter('model_path', model_path)
-            comet_logger.experiment.log_parameter('train_aug', 
-                                                  str({'train_aug': data_transforms['train']}))
-            comet_logger.experiment.log_parameter('val_aug', 
-                                                  str({'val_aug': data_transforms['val']}))
 
-            comet_logger.experiment.add_tag(f'{args.classes}classes')
-            comet_logger.experiment.add_tag("finetuning")
-            comet_logger.experiment.add_tag(method)
-            
-            #log the code for visual inspection
-            comet_logger.experiment.log_code(folder='/utils/')
-            comet_logger.experiment.log_code(folder='/models/')
-            comet_logger.experiment.log_code(file_name='/custom_dataset.py')
             
             
             # Learning Rate Logger
@@ -381,7 +329,7 @@ if __name__ == "__main__":
                                                   filename='{epoch:03d}-{val_loss:.3f}-{val_AUC_epoch:.3f}')
 
             callbacks = [lr_logger, early_stopping, checkpoint_callback]
-            loggers = [csv, comet_logger]
+            loggers = [csv]
 
 
         print("Setting Up Model and PL-Trainer...")
@@ -408,19 +356,9 @@ if __name__ == "__main__":
 
             print("Logging...")
             print(f"csv_path:  {metrics_path} \nParam Path: {param_path} \nSave Root PATH: {base_path}")
-            comet_logger.experiment.log_asset_folder(base_path, 
-                                                     recursive=True,
-                                                     )
 
             best_model_path = checkpoint_callback.best_model_path
             print(f"BEST MODEL FOUND AT PATH: {best_model_path}")
-
-            #log model code and paths
-            comet_logger.experiment.set_model_graph(model)
-            comet_logger.experiment.log_other("base_path", base_path)
-            comet_logger.experiment.log_other("metrics_path", metrics_path)
-            comet_logger.experiment.log_other("params_path", param_path)
-            comet_logger.experiment.log_other("best_model_path", best_model_path)
 
 
         #if it is in debug mode, test with the weights from the last epoch
@@ -431,9 +369,3 @@ if __name__ == "__main__":
             print(f"Testing with model from path: {checkpoint_callback.best_model_path}")
             trainer.test(test_dataloaders=test_loader,
                          ckpt_path=checkpoint_callback.best_model_path)
-
-
-        if not args.debug:
-            comet_logger.experiment.end()
-    
-
