@@ -108,11 +108,6 @@ def adjust_last_layers(method, ft_from_featuremap, model):
     Adjust the last layer from the network. This is only required
     when fine-tuning from feature map instead from the latent representation.
 
-    Args:
-    dataset: a instance of torch.utils.data.Dataset class.
-
-    n: number of copies to be created for each sample.
-
     """
     if method in ['simclr', 'swav', 'byol'] and ft_from_featuremap:
         model.avgpool = Identity()
